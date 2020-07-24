@@ -1,5 +1,7 @@
 *.pyc
-*.m4a
-*.mav
 .idea/
 .vscode/
+client_secret*.json
+.credentials/
+data/
+logs/
