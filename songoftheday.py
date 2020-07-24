@@ -34,14 +34,18 @@ def get_credentials():
     if not credentials or credentials.invalid:
 
         # try to find a client_secrets json file in the current directory
-        client_secret = list(cwd.glob('client_secret*.json'))[0]
+        client_secret = list(cwd.glob('client_secret*.json'))
 
-        # validate credentials using client_secret
-        scopes = 'https://www.googleapis.com/auth/calendar.readonly'
-        flow = client.flow_from_clientsecrets(client_secret, scopes)
-        flow.user_agent = 'Song of the Day'
-        credentials = tools.run_flow(flow, store)
-        print('Storing credentials to ' + str(credential_path))
+        if client_secret:
+            # validate credentials using client_secret
+            scopes = 'https://www.googleapis.com/auth/calendar.readonly'
+            flow = client.flow_from_clientsecrets(client_secret[0], scopes)
+            flow.user_agent = 'Song of the Day'
+            credentials = tools.run_flow(flow, store)
+            print('Storing credentials to ' + str(credential_path))
+        else:
+            raise FileNotFoundError('Could not find client_secret json file')
+            
     return credentials
 
 
