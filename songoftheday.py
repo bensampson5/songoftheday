@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-
-import os
 import datetime
 import requests
 import httplib2
@@ -13,6 +10,8 @@ from oauth2client import tools
 from oauth2client.file import Storage
 from googleapiclient import discovery
 from PIL import Image, ImageDraw, ImageFont
+import billboard
+import random
 
 
 def get_credentials():
@@ -82,20 +81,19 @@ def get_eligible_sotd_events():
         return [e for e in events if e['start'].get('date') == str(datetime.date.today())]
 
 
-def get_itunes_song_data(search_terms="", random=False):
+def get_itunes_song_data(search_terms="", select_random=False):
     """Queries iTunes based on search_terms and returns song data for first hit with a valid
     previewUrl. If no songs are found then it returns None. If random flag is true then it
     ignores the search_terms and gets the song data for a random song from iTunes.
 
     :param search_terms: str
-    :param random: bool (default=False)
+    :param select_random: bool (default=False)
     :return: song data or None
     """
-
-    if not random:
+    if not select_random:
         # url encode search term input from user. Only look for songs
         query = urlencode(
-            {'term': search_terms, 'media': 'music', 'entity': 'song', 'explicit': 'No'})
+            {'term': search_terms, 'media': 'music', 'entity': 'song'})
 
         # request data from iTunes and process returned json object
         r = requests.get("https://itunes.apple.com/search?" + query)
@@ -103,33 +101,30 @@ def get_itunes_song_data(search_terms="", random=False):
 
         # return first hit that has a valid previewUrl
         for result in data['results']:
-            if result['previewUrl'] is not None:
-                return result
+            if result['previewUrl']:
+                    if result['trackExplicitness'] != 'explicit':
+                        return result
 
     else:
-        # random is implemented by getting the first song from The Current's Song of the Day
+        # select_random is implemented by getting a random song from the billboard hot 100
         # that has a valid 30 second preview on iTunes
+        chart = billboard.ChartData('hot-100')
+        songs = [song.title + ' ' + song.artist for song in chart]
+        random.shuffle(songs)
 
-        # pull all items from Song of the Day feed from The Current
-        r = requests.get(
-            "https://feeds.publicradio.org/public_feeds/song-of-the-day/rss/rss")
-        rss_root = et.fromstring(r.content.decode("utf-8"))
-        items_sotd = rss_root.find('channel').findall('item')
-
-        # iterate through each item on Song of the Day feed from The Current and look up on iTunes
-        # for a match
-        for i in items_sotd:
-            query = urlencode({'term': i.find('title').text,
-                               'media': 'music', 'entity': 'song'})
+        for song in songs:
+            query = urlencode({'term': song, 'media': 'music', 'entity': 'song'})
 
             # request data from iTunes and process returned json object
             r = requests.get("https://itunes.apple.com/search?" + query)
             data = r.json()
+            print(data)
 
-            # return first hit that has a valid previewUrl
+            # return first hit that has a valid previewUrl and is not explicit
             for result in data['results']:
                 if result['previewUrl']:
-                    return result
+                    if result['trackExplicitness'] != 'explicit':
+                        return result
 
 
 if __name__ == "__main__":
@@ -159,10 +154,10 @@ if __name__ == "__main__":
         # case: there was one or more eligible sotd events on calendar for today but couldn't match
         # query to any song preview on iTunes. In this case, get a random song.
         if not sotd_itunes_data:
-            sotd_itunes_data = get_itunes_song_data(random=True)
+            sotd_itunes_data = get_itunes_song_data(select_random=True)
 
     else:  # case: no eligible sotd events found on the calendar for today so get a random song
-        sotd_itunes_data = get_itunes_song_data(random=True)
+        sotd_itunes_data = get_itunes_song_data(select_random=True)
 
     if sotd_itunes_data:
 
