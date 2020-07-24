@@ -17,5 +17,5 @@ docker build -f Dockerfile.ubuntu -t songoftheday .
 3. Run the songoftheday.py script within the docker image.
 
 ```
-docker run --rm -v $(pwd):/code songoftheday "/bin/bash cd /code && python songoftheday.py"
+docker run --rm -v $(pwd):/code songoftheday bash /code/run_in_docker.sh
 ```
