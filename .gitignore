@@ -1,0 +1,5 @@
+*.pyc
+*.m4a
+*.mav
+.idea/
+.vscode/
