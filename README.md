@@ -12,8 +12,14 @@ The current song of the day audio files are written to the `songs/` directory in
 
 3. Build the docker image.
 
+**No proxy**
 ```bash
 docker build -f Dockerfile.ubuntu -t songoftheday . 
+```
+
+**Proxy**
+```bash
+docker build -f Dockerfile.ubuntu -t songoftheday --build-arg http_proxy=http://proxy.example.com:80 . 
 ```
 
 4. Run the songoftheday.py script within the docker image.
