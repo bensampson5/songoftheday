@@ -1,5 +1,8 @@
 FROM ubuntu:16.04
 
+# Uncomment and fill out the following two lines if behind a proxy
+#ENV http_proxy=http://proxy.example.com:80
+#ENV https_proxy=http://proxy.example.com:80
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -15,7 +18,6 @@ RUN apt-get update && \
         libreadline-dev \
         libffi-dev \
         ffmpeg \
-        sox \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -31,11 +33,15 @@ RUN cd /tmp && \
     rm -rf Python-3.8.3 Python-3.8.3.tgz
 
 # Install 3rd party Python packages using pip
-RUN pip3 config set global.proxy http://proxy-lmi.global.lmco.com:80 && \
-    pip3 config set global.trusted-host "pypi.org python.pypi.org files.pythonhosted.org" && \
+RUN if [[ $http_proxy != "" ]]; then \
+        pip3 config set global.proxy $http_proxy && \
+        pip3 config set global.trusted-host "pypi.org python.pypi.org files.pythonhosted.org"; fi; \
     pip3 install --upgrade pip && \
     pip3 install \
         google-api-python-client \
         oauth2client \
         Pillow \
         billboard.py
+
+RUN mkdir /code
+WORKDIR /code

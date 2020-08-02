@@ -122,7 +122,6 @@ def get_itunes_song_data(search_terms="", select_random=False):
             # request data from iTunes and process returned json object
             r = requests.get("https://itunes.apple.com/search?" + query)
             data = r.json()
-            print(data)
 
             # return first hit that has a valid previewUrl and is not explicit
             for result in data['results']:
@@ -191,17 +190,6 @@ if __name__ == "__main__":
             if proc.stderr:
                 print('stderr:\n' + proc.stderr.decode() + '\n')
             raise Exception('m4a to wav conversion using ffmpeg failed')
-
-        # use sox to modify wav file for speaker system
-        cmd = ' '.join(['sox', str(wav_fname), '-c 1', str(wav_fname).split('.')[0] + '_modified' +
-                        wav_fname.suffix, 'lowpass 5000 silence 1 3 2% compand 0.3,1 6:-70,-60,-20 -5 -90 0.2'])
-        proc = subprocess.run(cmd, capture_output=True, timeout=10, shell=True)
-        if proc.returncode != 0:  # check if completed successfully
-            if proc.stdout:
-                print('stdout:\n' + proc.stdout.decode() + '\n')
-            if proc.stderr:
-                print('stderr:\n' + proc.stderr.decode() + '\n')
-            raise Exception('wav modification using sox failed')
 
         # Grab important information from song of the day
         dt = str(datetime.datetime.now())
