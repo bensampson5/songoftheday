@@ -6,26 +6,30 @@ The current song of the day audio files are written to the `songs/` directory in
 
 ## How to use
 
-1. Get the client_secret json file for accessing the Google Calendar from the Google API and save it to the top-level directory in the project.
+1. Clone the songoftheday repository from GitHub.
 
-2. If behind a proxy, [modify the Dockerfile for your proxy configuration](https://github.com/bensampson5/songoftheday/blob/master/Dockerfile.ubuntu#L3).
+```bash
+git clone https://github.com/bensampson5/songoftheday.git
+```
+
+2. Get the client_secret json file for accessing the Google Calendar from the Google API and save it to the top-level directory in the project.
 
 3. Build the docker image.
 
 **No proxy**
 ```bash
-docker build -f Dockerfile.ubuntu -t songoftheday . 
+docker build -f Dockerfile -t songoftheday .
 ```
 
 **Proxy**
 ```bash
-docker build -f Dockerfile.ubuntu -t songoftheday --build-arg http_proxy=http://proxy.example.com:80 . 
+docker build -f Dockerfile -t songoftheday --build-arg http_proxy=http://proxy.example.com:80 .
 ```
 
 4. Run the songoftheday.py script within the docker image.
 
 ```bash
-docker run --rm -v $(pwd):/code songoftheday python3 songoftheday.py
+docker run --rm -v $(pwd):/code songoftheday python songoftheday.py
 ```
 
 5. Output files are written to the `data/` directory.

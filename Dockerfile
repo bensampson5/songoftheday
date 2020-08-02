@@ -6,16 +6,17 @@ RUN apt-get update && \
         ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone songoftheday repo from GitHub
-RUN git clone https://github.com/bensampson5/songoftheday.git
-
 # Install 3rd party Python packages required by songoftheday using pip
+WORKDIR /songoftheday
 RUN if [ "$http_proxy" != "" ]; then \
         pip config set global.proxy $http_proxy && \
         pip config set global.trusted-host "pypi.org python.pypi.org files.pythonhosted.org"; fi; \
     pip install --upgrade pip && \
-    cd songoftheday
-# pip install -r requirements.txt
+    pip install \
+        google-api-python-client \
+        oauth2client \
+        Pillow \
+        billboard.py
 
 RUN mkdir /code
 WORKDIR /code
