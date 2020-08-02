@@ -27,7 +27,7 @@ RUN cd /tmp && \
     tar xvf Python-3.8.3.tgz && \
     cd Python-3.8.3 && \
     ./configure --enable-optimizations && \
-    make && \
+    make -j$(nproc) && \
     make install && \
     cd .. && \
     rm -rf Python-3.8.3 Python-3.8.3.tgz
