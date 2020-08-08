@@ -41,7 +41,9 @@ def get_credentials():
             scopes = 'https://www.googleapis.com/auth/calendar.readonly'
             flow = client.flow_from_clientsecrets(client_secret[0], scopes)
             flow.user_agent = 'Song of the Day'
-            credentials = tools.run_flow(flow, store)
+            args = tools.argparser.parse_args()
+            args.noauth_local_webserver = True
+            credentials = tools.run_flow(flow, store, args)
             print('Storing credentials to ' + str(credential_path))
         else:
             raise FileNotFoundError('Could not find client_secret json file')

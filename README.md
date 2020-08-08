@@ -28,8 +28,11 @@ docker build -f Dockerfile -t songoftheday --build-arg http_proxy=http://proxy.e
 
 4. Run the songoftheday.py script within the docker image.
 
+ The first time you run this you will need to authenticate with Google Calendar so follow the instructions. After this first authentication,
+ the songoftheday application stores the credentials used so that all subsequent runs can happen without user input.
+
 ```bash
-docker run --rm -v $(pwd):/code songoftheday python songoftheday.py
+docker run -i --rm -v $(pwd):/code songoftheday python songoftheday.py
 ```
 
 5. Output files are written to the `data/` directory.
